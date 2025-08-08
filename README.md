@@ -19,11 +19,17 @@ The project uses a **Convolutional Neural Network (CNN)** (ResNet50) trained on 
 diabetic-retinopathy-detection
 
 │── app.py # Flask app entry point
+
 │── model/ # Saved model files
+
 │── static/ # CSS, JS, and images
+
 │── templates/ # HTML templates (upload, results, charts)
+
 │── requirements.txt # Python dependencies
+
 │── README.md # Project documentation
+
 │── .gitignore # Ignoring large dataset files
 
 
