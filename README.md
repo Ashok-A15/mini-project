@@ -16,7 +16,8 @@ The project uses a **Convolutional Neural Network (CNN)** (ResNet50) trained on 
 
 ## 📂 Project Structure
 
-diabetic-retinopathy-detection/
+diabetic-retinopathy-detection
+
 │── app.py # Flask app entry point
 │── model/ # Saved model files
 │── static/ # CSS, JS, and images
@@ -46,17 +47,20 @@ diabetic-retinopathy-detection/data/
 bash
 git clone https://github.com/YOUR_USERNAME/diabetic-retinopathy-detection.git
 cd diabetic-retinopathy-detection
+
 2️⃣ Install Dependencies
-Flask
-Flask-SQLAlchemy
-mysqlclient
-pymysql
-Flask-Migrate
-python-dotenv
+pip install -r Flask
+pip install -r Flask-SQLAlchemy
+pip install -rmysqlclient
+pip install -rpymysql
+pip install -rFlask-Migrate
+pip install -rpython-dotenv
 
 pip install -r requirements.txt
+
 3️⃣ Download the Dataset
 Download from Kaggle and place inside the data/ folder.
+
 
 4️⃣ Run the Application
 # Install dependencies
