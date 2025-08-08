@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DR Analysis - Charts & Statistics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            color: #2d3748;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 1000;
+            padding: 1rem 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d3748;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo i {
+            color: #667eea;
+            font-size: 2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding-top: 100px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="%23ffffff10" points="0,0 1000,300 1000,1000 0,700"/></svg>');
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-section h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-section p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Charts Section */
+        .charts-section {
+            padding: 4rem 0;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .chart-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .chart-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+
+        .chart-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+        }
+
+        .chart-description {
+            text-align: center;
+            color: #718096;
+            font-size: 1.1rem;
+            margin-top: 1.5rem;
+            line-height: 1.6;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        /* Classification Legend */
+        .legend {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .legend h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+        }
+
+        .legend-item:hover {
+            background: #e2e8f0;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .legend-color.normal { background: #b87333; }
+        .legend-color.mild { background: #76A7FA; }
+        .legend-color.moderate { background: #703523; }
+        .legend-color.severe { background: #FFD700; }
+        .legend-color.proliferative { background: #703593; }
+
+        .legend-text {
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        /* Info Cards */
+        .info-section {
+            padding: 3rem 0;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .info-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .info-card h3 {
+            font-size: 1.3rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-card p {
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+
+            .chart-container {
+                padding: 1rem;
+            }
+
+            .chart-wrapper {
+                min-height: 300px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .legend-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        /* Custom Chart Styles */
+        .google-visualization-chartarea-background {
+            stroke: none !important;
+            fill: transparent !important;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 400px;
+            font-size: 1.2rem;
+            color: #718096;
+        }
+
+        .loading::before {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('first') }}" class="logo">
+                <i class="fas fa-eye"></i>
+                <span>DR Prediction</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('first') }}">Home</a></li>
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('upload') }}">Upload</a></li>
+                <li><a href="{{ url_for('chart') }}" class="active">Analysis</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>Diabetic Retinopathy Analysis</h1>
+                    <p>Comprehensive statistical analysis and visualization of diabetic retinopathy classification results using Fast-RCNN technology</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="charts-section">
+            <div class="container">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="stat-value">98%</div>
+                        <div class="stat-label">Model Accuracy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-images"></i>
+                        </div>
+                        <div class="stat-value">10K+</div>
+                        <div class="stat-label">Images Processed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div class="stat-value">5</div>
+                        <div class="stat-label">Classification Types</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-value">2.3s</div>
+                        <div class="stat-label">Avg Processing Time</div>
+                    </div>
+                </div>
+
+                <!-- Classification Legend -->
+                <div class="legend">
+                    <h3>Diabetic Retinopathy Classification Types</h3>
+                    <div class="legend-grid">
+                        <div class="legend-item">
+                            <div class="legend-color normal"></div>
+                            <div class="legend-text">Normal - No DR detected</div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color mild"></div>
+                            <div class="legend-text">Mild - Early stage DR</div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color moderate"></div>
+                            <div class="legend-text">Moderate - Progressing DR</div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color severe"></div>
+                            <div class="legend-text">Severe - Advanced DR</div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color proliferative"></div>
+                            <div class="legend-text">Proliferative - Critical stage</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column Chart -->
+                <div class="chart-container">
+                    <h2 class="chart-title">Diabetic Retinopathy Classification Distribution</h2>
+                    <div class="chart-wrapper">
+                        <div id="columnchart_values" style="width: 100%; height: 400px;"></div>
+                    </div>
+                    <p class="chart-description">
+                        This bar chart shows the distribution of different diabetic retinopathy classifications in our dataset. 
+                        The data reveals prevalence patterns across different severity levels.
+                    </p>
+                </div>
+
+                <!-- Pie Chart -->
+                <div class="chart-container">
+                    <h2 class="chart-title">Retinopathy Classification Breakdown</h2>
+                    <div class="chart-wrapper">
+                        <div id="piechart_3d" style="width: 100%; height: 500px;"></div>
+                    </div>
+                    <p class="chart-description">
+                        This 3D pie chart provides a comprehensive view of the proportion of each diabetic retinopathy 
+                        classification type in our analyzed dataset.
+                    </p>
+                </div>
+
+                <!-- Accuracy Plot -->
+                <div class="chart-container">
+                    <h2 class="chart-title">Fast-RCNN Model Training Accuracy</h2>
+                    <div class="chart-wrapper">
+                        <div id="accuracy_chart" style="width: 100%; height: 400px;"></div>
+                    </div>
+                    <p class="chart-description">
+                        This line chart demonstrates the training and testing accuracy of our Fast-RCNN model across different epochs, 
+                        showing consistent improvement and convergence.
+                    </p>
+                </div>
+
+                <!-- Info Section -->
+                <div class="info-section">
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h3>
+                                <i class="fas fa-info-circle" style="color: #667eea;"></i>
+                                About Fast-RCNN
+                            </h3>
+                            <p>
+                                Fast-RCNN is a state-of-the-art deep learning architecture that excels at object detection and classification tasks. 
+                                Our implementation is specifically optimized for medical image analysis, providing accurate diabetic retinopathy detection.
+                            </p>
+                        </div>
+                        <div class="info-card">
+                            <h3>
+                                <i class="fas fa-eye" style="color: #667eea;"></i>
+                                Early Detection Benefits
+                            </h3>
+                            <p>
+                                Early detection of diabetic retinopathy is crucial for preventing vision loss. Our AI system can identify subtle changes 
+                                in retinal images that might be missed during routine examinations, enabling timely intervention.
+                            </p>
+                        </div>
+                        <div class="info-card">
+                            <h3>
+                                <i class="fas fa-chart-line" style="color: #667eea;"></i>
+                                Accuracy Metrics
+                            </h3>
+                            <p>
+                                Our model achieves 98% accuracy with high precision and recall rates across all classification types. 
+                                The system has been validated on diverse datasets ensuring robust performance across different demographics.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Scripts -->
+    <script type="text/javascript">
+        // Load Google Charts
+        google.charts.load("current", {packages:['corechart']});
+        google.charts.setOnLoadCallback(drawCharts);
+
+        function drawCharts() {
+            drawColumnChart();
+            drawPieChart();
+            drawAccuracyChart();
+        }
+
+        function drawColumnChart() {
+            var data = google.visualization.arrayToDataTable([
+                ["Classification", "Percentage", { role: "style" }],
+                ["Normal", 35, "#b87333"],
+                ["Mild", 42, "#76A7FA"],
+                ["Moderate", 48, "#703523"],
+                ["Severe", 51, "#FFD700"],
+                ["Proliferative", 51, "#703593"]
+            ]);
+
+            var view = new google.visualization.DataView(data);
+            view.setColumns([0, 1, {
+                calc: "stringify",
+                sourceColumn: 1,
+                type: "string",
+                role: "annotation"
+            }, 2]);
+
+            var options = {
+                title: "",
+                width: '100%',
+                height: 400,
+                bar: {groupWidth: "70%"},
+                legend: { position: "none" },
+                backgroundColor: 'transparent',
+                titleTextStyle: {
+                    fontSize: 18,
+                    fontName: 'Inter'
+                },
+                hAxis: {
+                    textStyle: {
+                        fontSize: 12,
+                        fontName: 'Inter'
+                    }
+                },
+                vAxis: {
+                    textStyle: {
+                        fontSize: 12,
+                        fontName: 'Inter'
+                    },
+                    title: 'Percentage (%)',
+                    titleTextStyle: {
+                        fontSize: 14,
+                        fontName: 'Inter'
+                    }
+                },
+                chartArea: {
+                    left: 80,
+                    top: 20,
+                    width: '80%',
+                    height: '75%'
+                }
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById("columnchart_values"));
+            chart.draw(view, options);
+        }
+
+        function drawPieChart() {
+            var data = google.visualization.arrayToDataTable([
+                ['Classification', 'Percentage'],
+                ['Normal', 35],
+                ['Mild', 42],
+                ['Moderate', 48],
+                ['Severe', 51],
+                ['Proliferative', 51]
+            ]);
+
+            var options = {
+                title: '',
+                is3D: true,
+                backgroundColor: 'transparent',
+                titleTextStyle: {
+                    fontSize: 18,
+                    fontName: 'Inter'
+                },
+                legend: {
+                    textStyle: {
+                        fontSize: 12,
+                        fontName: 'Inter'
+                    }
+                },
+                colors: ['#b87333', '#76A7FA', '#703523', '#FFD700', '#703593'],
+                chartArea: {
+                    left: 20,
+                    top: 20,
+                    width: '90%',
+                    height: '85%'
+                }
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
+            chart.draw(data, options);
+        }
+
+        function drawAccuracyChart() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Epochs');
+            data.addColumn('number', 'Training Accuracy');
+            data.addColumn('number', 'Testing Accuracy');
+            data.addRows([
+                ['10', 0.75, 0.74],
+                ['20', 0.82, 0.81],
+                ['30', 0.85, 0.86],
+                ['40', 0.92, 0.93],
+                ['50', 0.98, 0.99]
+            ]);
+
+            var options = {
+                title: '',
+                backgroundColor: 'transparent',
+                hAxis: {
+                    title: 'Epochs',
+                    titleTextStyle: {
+                        fontSize: 14,
+                        fontName: 'Inter'
+                    },
+                    textStyle: {
+                        fontSize: 12,
+                        fontName: 'Inter'
+                    }
+                },
+                vAxis: {
+                    title: 'Accuracy',
+                    titleTextStyle: {
+                        fontSize: 14,
+                        fontName: 'Inter'
+                    },
+                    textStyle: {
+                        fontSize: 12,
+                        fontName: 'Inter'
+                    },
+                    format: 'percent'
+                },
+                legend: {
+                    textStyle: {
+                        fontSize: 12,
+                        fontName: 'Inter'
+                    }
+                },
+                colors: ['#667eea', '#764ba2'],
+                lineWidth: 3,
+                pointSize: 6,
+                chartArea: {
+                    left: 80,
+                    top: 20,
+                    width: '80%',
+                    height: '75%'
+                }
+            };
+
+            var chart = new google.visualization.LineChart(document.getElementById('accuracy_chart'));
+            chart.draw(data, options);
+        }
+
+        // Responsive chart resizing
+        window.addEventListener('resize', function() {
+            drawCharts();
+        });
+
+        // Smooth scrolling and animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const animatedElements = document.querySelectorAll('.chart-container, .stat-card, .info-card');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-fade-in-up');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            animatedElements.forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

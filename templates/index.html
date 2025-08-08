@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DR Classifier - Enhanced Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 2.2rem;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .upload-section {
+            margin-bottom: 2rem;
+        }
+
+        .upload-label {
+            display: inline-block;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            border: none;
+            margin-bottom: 1rem;
+        }
+
+        .upload-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+            background: linear-gradient(45deg, #2980b9, #3498db);
+        }
+
+        #imageUpload {
+            display: none;
+        }
+
+        .image-section {
+            margin: 2rem 0;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .image-section.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .img-preview {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .img-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .upload-placeholder {
+            color: #6c757d;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .btn-predict {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            margin-top: 1rem;
+        }
+
+        .btn-predict:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+            background: linear-gradient(45deg, #c0392b, #e74c3c);
+        }
+
+        .btn-predict:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loader {
+            display: none;
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .result.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .result.positive {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .result.negative {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .result.warning {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color: white;
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+        }
+
+        .medical-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .confidence-bar {
+            background: #ecf0f1;
+            border-radius: 10px;
+            height: 10px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            border-radius: 10px;
+            transition: width 0.8s ease;
+        }
+
+        .footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            color: white;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 1rem;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-card {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: left;
+        }
+
+        .info-card h4 {
+            color: #2980b9;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            
+            h2 {
+                font-size: 1.8rem;
+            }
+            
+            .upload-label {
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="medical-icon">🏥</div>
+        <h2>DR Classifier</h2>
+        <p class="subtitle">Advanced Diabetic Retinopathy Detection using Fast-RCNN Classification</p>
+        
+        <div class="info-card">
+            <h4>📊 How it works</h4>
+            <p>Upload a retinal image and our AI model will analyze it for signs of diabetic retinopathy. The system uses advanced deep learning techniques to provide accurate predictions.</p>
+        </div>
+
+        <div class="upload-section">
+            <form id="upload-file" method="post" enctype="multipart/form-data">
+                <label for="imageUpload" class="upload-label">
+                    📷 Choose Retinal Image
+                </label>
+                <input type="file" name="file" id="imageUpload" accept=".png, .jpg, .jpeg">
+            </form>
+        </div>
+
+        <div class="image-section" id="imageSection">
+            <div class="img-preview" id="imagePreview">
+                <div class="upload-placeholder">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📸</div>
+                    <p>Selected image will appear here</p>
+                </div>
+            </div>
+            <button type="button" class="btn-predict" id="btn-predict">
+                🔍 Analyze Image
+            </button>
+        </div>
+
+        <div class="loader" id="loader"></div>
+
+        <div class="result" id="result">
+            <span id="resultText"></span>
+            <div class="confidence-bar" id="confidenceBar" style="display: none;">
+                <div class="confidence-fill" id="confidenceFill"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        🏥 Diabetic Retinopathy Prediction System | Advanced Healthcare AI
+    </div>
+
+    <script>
+        // File upload handling
+        document.getElementById('imageUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageSection = document.getElementById('imageSection');
+                    const imagePreview = document.getElementById('imagePreview');
+                    
+                    imagePreview.innerHTML = `<img src="${e.target.result}" alt="Uploaded Image">`;
+                    imageSection.style.display = 'block';
+                    
+                    // Add show class with slight delay for animation
+                    setTimeout(() => {
+                        imageSection.classList.add('show');
+                    }, 100);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Predict button handling
+        document.getElementById('btn-predict').addEventListener('click', function() {
+            const fileInput = document.getElementById('imageUpload');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select an image first!');
+                return;
+            }
+
+            // Show loader
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('result').classList.remove('show');
+            this.disabled = true;
+            this.textContent = 'Analyzing...';
+
+            // Simulate prediction process (replace with actual AJAX call)
+            setTimeout(() => {
+                // Hide loader
+                document.getElementById('loader').style.display = 'none';
+                
+                // Show mock result (replace with actual prediction result)
+                const mockResults = [
+                    { text: '✅ No DR Detected', type: 'negative', confidence: 92 },
+                    { text: '⚠️ Mild DR Detected', type: 'warning', confidence: 78 },
+                    { text: '🔴 Severe DR Detected', type: 'positive', confidence: 85 },
+                    { text: '⚠️ Moderate DR Detected', type: 'warning', confidence: 73 }
+                ];
+                
+                const result = mockResults[Math.floor(Math.random() * mockResults.length)];
+                
+                const resultDiv = document.getElementById('result');
+                const resultText = document.getElementById('resultText');
+                const confidenceBar = document.getElementById('confidenceBar');
+                const confidenceFill = document.getElementById('confidenceFill');
+                
+                resultText.textContent = `${result.text} (Confidence: ${result.confidence}%)`;
+                resultDiv.className = `result ${result.type}`;
+                
+                // Show confidence bar
+                confidenceBar.style.display = 'block';
+                setTimeout(() => {
+                    confidenceFill.style.width = `${result.confidence}%`;
+                }, 100);
+                
+                // Show result with animation
+                setTimeout(() => {
+                    resultDiv.classList.add('show');
+                }, 200);
+                
+                // Reset button
+                this.disabled = false;
+                this.textContent = '🔍 Analyze Image';
+            }, 3000);
+        });
+
+        // Drag and drop functionality
+        const imagePreview = document.getElementById('imagePreview');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            imagePreview.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            imagePreview.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            imagePreview.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            imagePreview.style.borderColor = '#3498db';
+            imagePreview.style.backgroundColor = '#ecf0f1';
+        }
+
+        function unhighlight(e) {
+            imagePreview.style.borderColor = '#dee2e6';
+            imagePreview.style.backgroundColor = '#f8f9fa';
+        }
+
+        imagePreview.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                document.getElementById('imageUpload').files = files;
+                document.getElementById('imageUpload').dispatchEvent(new Event('change'));
+            }
+        }
+    </script>
+</body>
+</html>
