@@ -51,7 +51,7 @@ diabetic-retinopathy-detection/data/
 
 ### 1️⃣ Clone the Repository
 bash
-git clone https://github.com/YOUR_USERNAME/diabetic-retinopathy-detection.git
+git clone https://github.com/Ashok-A15/mini-project/tree/main
 cd diabetic-retinopathy-detection
 
 2️⃣ Install Dependencies
