@@ -113,7 +113,7 @@ PythonAnywhere
 📝 License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-🤝 Acknowledgements
+
 ## 🤝 Acknowledgements
 
 - **Kaggle** – APTOS 2019 Blindness Detection Dataset  
